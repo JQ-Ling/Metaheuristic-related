@@ -7,11 +7,13 @@ function [fit, TNB_revenue_CES, cost, EFCs] = P2P(L)
     % Convert inputArray to a string with space-separated values
     inputString = sprintf('%d ', input);
 
+
     % Define the full path to the executable file
-    exePath = '"D:\Jacky\Julia-vscode\(Cpp)ADMM_P2P\x64\Release\p2p.exe"';
+    exePath = '"C:\Users\PC\source\repos\p2p_optimal placement\x64\Release\p2p_optimal placement.exe"';
 
     % Call the executable file with appropriate command-line arguments
     command = [exePath ' ' inputString];
+    % disp(command)
     status = system(command);
 
     % Check the status of the system call
