@@ -54,6 +54,6 @@ for i = 1:10
     FinalPOS = Pareto_position;
     FinalFitness = Pareto_objective;
     filename_test = strcat("D:\Jacky\MATLAB\OptimalPlacement\Result\MOMSA result 100pop", num2str(i) ,".xlsx");
-    % xlswrite(filename_test, FinalPOS, 'Sheet1');
-    % xlswrite(filename_test, FinalFitness, 'Sheet2');
+    xlswrite(filename_test, FinalPOS, 'Sheet1');
+    xlswrite(filename_test, FinalFitness, 'Sheet2');
 end
