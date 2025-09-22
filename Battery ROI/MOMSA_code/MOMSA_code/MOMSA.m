@@ -223,7 +223,13 @@ all_idx  = all_idx(1:log_ptr,:);
 % Pack all evaluations
 all_evals = [all_gen all_idx all_X all_F];     % [gen, agent, x..., f...]
 
-% Also save to MAT for offline analysis
-save('momsa_full_log.mat', 'all_evals', 'pop_log', 'pool_log', 'gen_sol');
+outFile = 'D:\Jacky\Data Output\Battery ROI\momsa_full_log.xlsx';
+
+% one sheet per variable, sheet name = variable name
+writematrix(all_X,   outFile, 'Sheet', 'all_X');
+writematrix(all_F,   outFile, 'Sheet', 'all_F');
+writematrix(all_gen, outFile, 'Sheet', 'all_gen');
+writematrix(all_idx, outFile, 'Sheet', 'all_idx');
+
 
 end

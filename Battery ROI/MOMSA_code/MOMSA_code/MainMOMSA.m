@@ -55,6 +55,6 @@ for i = 1:1
     FinalPOS = Pareto_position;
     FinalFitness = Pareto_objective;
     filename_test = strcat("D:\Jacky\Data Output\Battery ROI\MOMSA unrank ", num2str(i), ".xlsx");
-    % xlswrite(filename_test, FinalPOS, 'Sheet1');
-    % xlswrite(filename_test, FinalFitness, 'Sheet2');
+    xlswrite(filename_test, FinalPOS, 'Sheet1');
+    xlswrite(filename_test, FinalFitness, 'Sheet2');
 end
