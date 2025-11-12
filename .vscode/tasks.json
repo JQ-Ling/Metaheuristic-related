@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Script usage_limit",
+      "type": "shell",
+      "command": "matlab -batch \"MainMOMSA\" -sd \"D:/Jacky/MATLAB/Battery_ROI/MOMSA_code/Usage_limit\""
+    },
+    {
+      "label": "Run Script usage_unlimit",
+      "type": "shell",
+      "command": "matlab -batch \"MainMOMSA\" -sd \"D:/Jacky/MATLAB/Battery_ROI/MOMSA_code/Usage_unlimit\"",
+      "dependsOn": ["Run Script usage_limit"],
+      "dependsOrder": "sequence"
+    }
+  ]
+}
