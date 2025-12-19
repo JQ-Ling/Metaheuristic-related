@@ -1,0 +1,176 @@
+function [ TNB_revenue_CES, cost_CES, C_aging_total] = P2P(L)
+    % global errtol busnum basemva basevoltage busga linedat
+
+    input_sol = L;
+    nbCES = 2;
+
+    % Convert inputArray to a string with space-separated values
+    input_sol(1) = 1 - input_sol(1)/1; % CES subscription price -> priority based
+    inputString = sprintf('%d ', input_sol);
+    CES_subsc_price = L(1) / 30; % per kWh per day
+    CES_subsc = sum(L(2:end));
+    total_size = 283.52 + 275.64;
+
+    % Define the full path to the executable file
+    if CES_subsc <= total_size
+        exePath = '"D:\Jacky\Julia-vscode\(Cpp)ADMM_P2P\x64\Release\p2p.exe"';
+        % Call the executable file with appropriate command-line arguments
+        command = [exePath ' ' inputString];
+        % disp(command)
+        status = system(command);
+        CES_capacity_boundary = 0;
+    else
+        CES_capacity_boundary = 1;
+        status = 1;
+    end
+
+    % Check the status of the system call
+    if status == 0
+        disp('Execution successful.');
+    else
+        disp('Execution failed.');
+    end
+
+    % disp(input_sol);
+
+    % Read the result
+    infeasible = str2double(fileread('infeasible.txt'));
+    cost_saving_constraint = 0;
+
+    if infeasible == 0 && status == 0
+        solar = csvread("Solar.csv") / 1000;
+        load = csvread("PowerConsumption.csv");
+        CES = csvread("NetLoadCES.csv");
+        profit = csvread("TNBProfit.csv");
+        cost = csvread("ProsumerCost.csv");
+        bat_level = csvread("Battery_Level_CES.csv");
+        user_q = csvread("Charge_Discharge.csv");
+
+        bat_level = bat_level(:, 1:2)';
+        bat_level(1,:) = bat_level(1,:) / 283.52;
+        bat_level(2,:) = bat_level(2,:) / 275.64;
+        user_q = user_q(:, 1:32);
+        load = [load(:, end) load(:, 1:end - 1)]' / 1000;
+        CES = [CES(:, end) CES(:, 1:end - 1)]' / 1000;
+        loc_CES = [19 33];
+
+        % Rainflow cycle counting for each CES
+        rf1 = rainflow(bat_level(1, :), 48);
+        rf2 = rainflow(bat_level(2, :), 48);
+        DODs1 = rf1(:, 2); % depth of discharge fractions (0–1)
+        counts1 = rf1(:, 1); % 0.5 = half cycle,
+        DODs2 = rf2(:, 2); % depth of discharge fractions (0–1)
+        counts2 = rf2(:, 1); % 0.5 = half cycle,
+        % EFCs = sum(DODs1 .* counts1) + sum(DODs2 .* counts2);
+
+        % Aging cost
+        % Based on datasheet, cycle life = 6000 cycles at (assumed) 80% DOD
+        N_100_fail = 4300;
+        kp = 1.5;
+        eta_c = 0.9;
+        eta_d = 0.9;
+
+        % Battery 1
+        C_aging1 = sum((DODs1.^kp * 1000 * 283.52) ./ (N_100_fail * eta_c * eta_d) .* counts1);
+
+        % Battery 2
+        C_aging2 = sum((DODs2.^kp * 1000 * 275.64) ./ (N_100_fail * eta_c * eta_d) .* counts2);
+
+        C_aging_total = C_aging1 + C_aging2;
+
+        % This is for usage price scheme, TNB earns from prosumer charging/discharging to CES
+        % TNB revenue from CES services == CES cost for prosumer
+        % cost_c = L(1);
+        % cost_d = L(2);
+        % TNB_revenue_CES = 0;
+        % for u = 1:32
+        %     prosumer_CES_cost(u) = 0;
+        %     for t = 1:48
+        %         if user_q(t,u) > 0
+        %             TNB_revenue_CES = TNB_revenue_CES + cost_c * user_q(t,u);
+        %             prosumer_CES_cost(u) = prosumer_CES_cost(u) + cost_c * user_q(t,u);
+        %         elseif user_q(t,u) < 0
+        %             TNB_revenue_CES = TNB_revenue_CES + cost_d * abs(user_q(t,u));
+        %             prosumer_CES_cost(u) = prosumer_CES_cost(u) + cost_d * abs(user_q(t,u));
+        %         end
+        %     end
+        % end
+
+        % For Subscription price scheme, TNB earns fixed cost from prosumer regardless of usage
+        TNB_revenue_CES = sum(L(2:end)) * CES_subsc_price;
+
+        % Add the CES cost to the total cost for each prosumer
+        % cost_CES = cost + prosumer_CES_cost';
+        cost_CES = cost + L(2:end)' * CES_subsc_price;
+
+        % Power flow analysis
+        % for t = 1:48
+        %     % disp(t)
+        %     data33_ga(1);
+            
+        %     buscs1 = busga;
+        %     % buscs1(:,7)=busga(:,7).*load(:,t);
+        %     % buscs1(:,8)=busga(:,8).*load(:,t);
+        %     % buscs1(:,7)=busga(:,7).*load(:,t);
+        %     buscs1(:, 8) = busga(:, 8) .* 0;
+        %     buscs1(:, 7) = load(:, t);
+        %     buscs1(24:end, 5) = 1.5 * solar(t);
+        %     buscs1(19, 5) = 16.5 * solar(t) * 1.5;
+        %     buscs1(19, 7) = 20 * load(19, t);
+
+        %     for n = 1:nbCES
+        %         % CES Prosumer
+        %         if CES(loc_CES(n), t) > 0 % charging
+        %             buscs1(loc_CES(n), 7) = buscs1(loc_CES(n), 7) + CES(loc_CES(n), t);
+        %         elseif CES(loc_CES(n), t) < 0 % discharging
+        %             buscs1(loc_CES(n), 5) = buscs1(loc_CES(n), 5) - CES(loc_CES(n), t);
+        %         end
+
+        %         % % CES TNB
+        %         % if CES(loc_CES(n)-1,t) > 0 % charging
+        %         %     buscs1(loc_CES(n)-1,7) = buscs1(loc_CES(n)-1,7)+CES(loc_CES(n)-1,t);
+        %         % elseif CES(loc_CES(n)-1,t) < 0 % discharging
+        %         %     buscs1(loc_CES(n)-1,5) = buscs1(loc_CES(n)-1,5)-CES(loc_CES(n)-1,t);
+        %         % end
+        %     end
+
+        %     [result] = gaLFThukaram(errtol, busnum, basemva, basevoltage, buscs1, linedat);
+        %     % [minV, minVno]=min(result.Vm);
+        %     % [maxV, maxVno]=max(result.Vm);
+        %     ploss(t) = sum(real(result.Lineloss));
+        %     vpii(t) = sum((result.Vm - 1) .^ 2);
+        % end
+
+        % ploss = normalize(ploss,'range');
+        % fit = 0.7*sum(ploss)+0.3*sum(vpii);
+        % fit = sum(ploss);
+        % disp(sum(ploss))
+
+        % Price range feasibility checking
+        %%%% Prosumer cost using CES should minimally be less than the normal (cost(P2P_CES) ≤ cost (P2P) %%%%
+        %%%% If not, it means the CES is not economical and should be penalized %%%%
+        costN = csvread("Benchmark\p2p_noCES\ProsumerCost_normal tariff.csv");
+        costP2P = csvread("Benchmark\p2p_noCES\ProsumerCost.csv");
+
+        % if  mean(cost_CES) > mean(costP2P) % meaning with using CES is more expensive
+        %     cost_saving_constraint = 1;
+        %     infeasible = 1;
+        % end
+    end
+
+    if infeasible == 1 || status == 1
+        C_aging_total = 1000000;
+        TNB_revenue_CES = 0;
+        cost_CES = 1000000;
+    end
+ 
+    if cost_saving_constraint == 1
+        cost_CES = 50000;
+    end
+
+    if CES_capacity_boundary == 1
+        C_aging_total = 50000;
+    end
+
+    % disp(fit)
+end
