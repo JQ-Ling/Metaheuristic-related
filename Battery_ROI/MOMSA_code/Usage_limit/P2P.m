@@ -27,6 +27,7 @@ function [fit, TNB_revenue_CES, cost, EFCs] = P2P(L)
 
     % Read the result
     infeasible = str2double(fileread('infeasible.txt'));
+    cost_saving_constraint = 0;
 
     if infeasible == 0 && status == 0
         solar = csvread("Solar.csv") / 1000;
@@ -72,7 +73,7 @@ function [fit, TNB_revenue_CES, cost, EFCs] = P2P(L)
         end
 
         % Add the CES cost to the total cost for each prosumer
-        cost = cost + prosumer_CES_cost';
+        cost_CES = cost + prosumer_CES_cost';
 
         % Power flow analysis
         for t = 1:48
@@ -118,15 +119,13 @@ function [fit, TNB_revenue_CES, cost, EFCs] = P2P(L)
         % disp(sum(ploss))
 
         % Price range feasibility checking
-        %%%% Prosumer cost under nornmal tariff should be higher than prosumer cost with P2P and P2P + CES %%%%
+        %%%% Prosumer cost using CES should minimally be less than the normal (cost(P2P_CES) ≤ cost (P2P) %%%%
         %%%% If not, it means the CES is not economical and should be penalized %%%%
         costN = csvread("Benchmark\p2p_noCES\ProsumerCost_normal tariff.csv");
         costP2P = csvread("Benchmark\p2p_noCES\ProsumerCost.csv");
-        CSP2P = costN - costP2P;
-        CSP2P_CES = costN - cost;
 
-        if CSP2P_CES - CSP2P < 0 % meaning CES is more expensive
-            infeasible = 1;
+        if  mean(cost_CES) > mean(costP2P) % meaning with using CES is more expensive
+            cost_saving_constraint = 1;
         end
     end
 
@@ -134,7 +133,11 @@ function [fit, TNB_revenue_CES, cost, EFCs] = P2P(L)
         fit = 100000;
         EFCs = 100000;
         TNB_revenue_CES = 0;
-        cost = 1000000;
+        cost_CES = cost_CES + 1000000;
+    end
+
+    if cost_saving_constraint == 1
+        cost_CES = cost_CES + 50000;
     end
 
     % disp(fit)
