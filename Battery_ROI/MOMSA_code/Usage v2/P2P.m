@@ -39,7 +39,7 @@ function [ TNB_revenue_CES, cost_CES, C_aging_total] = P2P(L)
         load = csvread("PowerConsumption.csv");
         CES = csvread("NetLoadCES.csv");
         profit = csvread("TNBProfit.csv");
-        cost = csvread("ProsumerCost.csv");
+        costwoCES = csvread("ProsumerCost.csv");
         bat_level = csvread("Battery_Level_CES.csv");
         user_q = csvread("Charge_Discharge.csv");
 
@@ -117,7 +117,7 @@ function [ TNB_revenue_CES, cost_CES, C_aging_total] = P2P(L)
 
 
         % Add the CES cost to the total cost for each prosumer
-        cost_CES = cost + prosumer_CES_cost';
+        cost_CES = costwoCES + prosumer_CES_cost';
 
         % Power flow analysis
         % for t = 1:48
