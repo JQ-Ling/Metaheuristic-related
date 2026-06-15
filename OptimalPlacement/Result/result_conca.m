@@ -2,12 +2,13 @@
 allPOS = [];
 allFitness = [];
 MOO = "MOMSA";
+bus_sys = "69bus_ptdf";
 MOO_idx = 1;
 
 % Loop through each file (from 1 to 10)
 for i = 1:10
     % Construct the filename based on your pattern
-    filename = strcat("D:\Jacky\MATLAB\OptimalPlacement\Result\Data\RankBeforeRankAll\", MOO, " result ", num2str(i), ".xlsx");
+    filename = strcat("D:\Jacky\Data Output\CES size and loc\", bus_sys, "\raw\", MOO, " result ", num2str(i), ".xlsx");
     
     % Try to read the file
     try
@@ -39,21 +40,23 @@ allPOS(:,6:9) = allPOS(:,6:9) + 5;
 trial_m = MOO_idx * ones(size(allPOS,1),1);
 
 % Save the concatenated data to a new Excel file
-output_filename = strcat("D:\Jacky\MATLAB\OptimalPlacement\Result\Data\", MOO, ".xlsx");
-filename_test = strcat("D:\Jacky\MATLAB\OptimalPlacement\Result\Data\", MOO, "_top 5.xlsx");
+output_filename = strcat("D:\Jacky\Data Output\CES size and loc\", bus_sys, "\", MOO, ".xlsx");
+filename_test = strcat("D:\Jacky\Data Output\CES size and loc\", bus_sys, "\", MOO, "_top 5.xlsx");
 
-folder_path = 'D:\Jacky\MATLAB\OptimalPlacement\MOMSA_code\MOMSA_code'; % Replace with your function folder path
+folder_path = 'D:\Jacky\MATLAB\Archieve for essential file'; % Replace with your function folder path
 addpath(folder_path);
-[top5_loc,~,score] = R_method(allFitness,[3 1.5 1.5]);
+[top5_loc,~,score] = R_method(allFitness,[1 2.5 2.5]);
 FinalFitness = allFitness(top5_loc,:);
 FinalPOS = allPOS(top5_loc,:);
 FinalTrial = trial_m(top5_loc,:);
+FinalScore = score(top5_loc,:);
 
 % Write to the output file
 try
     xlswrite(output_filename, allPOS, 'Sheet1');
     xlswrite(output_filename, allFitness, 'Sheet2');
     xlswrite(output_filename, trial_m, 'Sheet3');
+    xlswrite(output_filename, score, 'Sheet4');
     fprintf('Successfully saved concatenated data to: %s\n', output_filename);
 catch e
     fprintf('Error saving concatenated data: %s\n', e.message);
@@ -64,7 +67,7 @@ try
     xlswrite(filename_test, FinalPOS, 'Sheet1');
     xlswrite(filename_test, FinalFitness, 'Sheet2');
     xlswrite(filename_test, FinalTrial, 'Sheet3');
-    xlswrite(filename_test, score, 'Sheet4');
+    xlswrite(filename_test, FinalScore, 'Sheet4');
     fprintf('Successfully saved top 5 data to: %s\n', filename_test);
 catch e
     fprintf('Error saving top 5 data: %s\n', e.message);
