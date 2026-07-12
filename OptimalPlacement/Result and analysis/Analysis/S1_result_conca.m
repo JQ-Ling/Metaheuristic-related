@@ -11,7 +11,7 @@ clear all; close all; clc;
 
 % Add the path to the standardized functions
 addpath('D:\Jacky\MATLAB\Standardized_functions');
-bus_sys = 69;
+bus_sys = 33;
 pf_model = "ptdf";
 
 all_MOO = ['MOPSO'; 'MOLA '; 'MOMSA'];

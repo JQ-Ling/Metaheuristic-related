@@ -11,8 +11,10 @@ clear; close; clc
 %   3. compute_global_ideal added alongside compute_global_nadir.
 %   4. Both nadir and ideal printed after STEP 3 for sanity check.
 %% ================================================================
+bus_sys = 33;
+pf_model = 'ptdf';
 
-folder            = "D:\Jacky\Data Output\CES size and loc\69bus_ptdf\convergence";
+folder            = strcat("D:\Jacky\Data Output\CES size and loc\", string(bus_sys), "bus_", pf_model, "\convergence");
 n_runs            = 10;
 algos             = {'MOMSA','MOLA','MOPSO'};
 penalty_threshold = 1e8;
@@ -111,11 +113,13 @@ for a = 1:numel(algos)
          'FaceAlpha', 0.15, 'EdgeColor', 'none', 'HandleVisibility','off');
     plot(x, mu, '-', 'Color', colors(a,:), 'LineWidth', 1.8, 'DisplayName', name);
 end
-xlabel('Iteration / Generation');
-ylabel('Hypervolume (shared [ideal, nadir] box)');
+xlabel('Iteration','FontSize', 18);
+ylabel('HV','FontSize', 18);
 legend('Location','southeast');
-set(gca,'FontSize',11);
+set(gca,'FontSize',18);
+grid on;
 hold off;
+saveas(gcf, 'HV_convergence.svg')
 
 %% ---------- STEP 7: final-HV summary ----------
 fprintf('\n--- Final HV (last iteration) ---\n');
