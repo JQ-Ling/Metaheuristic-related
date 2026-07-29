@@ -15,8 +15,8 @@ clear all; clc;
 addpath('D:\Jacky\MATLAB\Standardized_functions');
 
 global PORT_NUM
-PORT_NUM = 8081;
-bus_sys = 69;
+PORT_NUM = 8084;
+bus_sys = 33;
 pf_model = "LDF";
 
 % Multi-objective function
@@ -118,10 +118,10 @@ switch MultiObjFnc
         MultiObj.truePF = PF;
     case 'P2P'
         MultiObj.fun = @(x) runP2P(x);
-        % MultiObj.var_min = [1 2 2 2 2 76 76 76 76];
-        % MultiObj.var_max = [4 33 33 33 33 304 304 304 304];
-        MultiObj.var_min = [1 2 2 2 2 2 2 2 2 76 76 76 76 76 76 76 76];
-        MultiObj.var_max = [8 69 69 69 69 69 69 69 69 304 304 304 304 304 304 304 304];
+        MultiObj.var_min = [1 2 2 2 2 76 76 76 76];
+        MultiObj.var_max = [4 33 33 33 33 304 304 304 304];
+        % MultiObj.var_min = [1 2 2 2 2 2 2 2 2 76 76 76 76 76 76 76 76];
+        % MultiObj.var_max = [8 69 69 69 69 69 69 69 69 304 304 304 304 304 304 304 304];
         MultiObj.nVar = length(MultiObj.var_min);
         % MultiObj.truePF = PF;
 end

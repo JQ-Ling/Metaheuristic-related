@@ -7,16 +7,16 @@ addpath('D:\Jacky\MATLAB\Standardized_functions');
 %% ----------------------------------------------------------------
 
 bus_sys = 69;
-pf_model = "ptdf";
+pf_model = "LDF";
 
 % Exhaustive Search (ES) reference front
-if bus_sys == 33
-    data = py.numpy.load("D:\Jacky\MATLAB\OptimalPlacement\Result and analysis\Result\Benchmark - raw collection\benchmark_all.npz", allow_pickle=true);
-    pos_all = double(data{'pos_all'});
-    obj_all = double(data{'obj_all'});
-    pyenv("Version","C:\Users\PC\anaconda3\envs\matlabpy\python.exe")
-    inx = zeros(size(pos_all,1),1);
-end
+% if bus_sys == 33
+%     data = py.numpy.load("D:\Jacky\MATLAB\OptimalPlacement\Result and analysis\Result\Benchmark - raw collection\benchmark_all.npz", allow_pickle=true);
+%     pos_all = double(data{'pos_all'});
+%     obj_all = double(data{'obj_all'});
+%     pyenv("Version","C:\Users\PC\anaconda3\envs\matlabpy\python.exe")
+%     inx = zeros(size(pos_all,1),1);
+% end
 
 % MOO algorithm results (MOPSO, MOLA, MOMSA)
 file_MOMSA = strcat("D:\Jacky\Data Output\CES size and loc\", string(bus_sys), "bus_", pf_model, "\MOMSA.xlsx");
@@ -68,20 +68,20 @@ end
 %  Use R-method to rank all solutions from all algorithms and exhaustive search.
 %% ----------------------------------------------------------------
 
-% try
-%        all_solutions = [moo1_solutions; moo2_solutions; moo3_solutions; pos_all];
-%        all_fits = [moo1_fits; moo2_fits; moo3_fits; obj_all];
-%        all_inx = [moo1_inx; moo2_inx; moo3_inx; inx];
+try
+       all_solutions = [moo1_solutions; moo2_solutions; moo3_solutions; pos_all];
+       all_fits = [moo1_fits; moo2_fits; moo3_fits; obj_all];
+       all_inx = [moo1_inx; moo2_inx; moo3_inx; inx];
 
-%        % all_solutions = [moo1_solutions; moo2_solutions; moo3_solutions];
-%        % all_fits = [moo1_fits; moo2_fits; moo3_fits];
-%        % all_inx = [moo1_inx; moo2_inx; moo3_inx];
-% catch e
-%        fprintf('Exhaustive search result not existed. Only MOO results will be ranked.\n');
-%        all_solutions = [moo1_solutions; moo2_solutions; moo3_solutions];
-%        all_fits = [moo1_fits; moo2_fits; moo3_fits];
-%        all_inx = [moo1_inx; moo2_inx; moo3_inx];
-% end
+       % all_solutions = [moo1_solutions; moo2_solutions; moo3_solutions];
+       % all_fits = [moo1_fits; moo2_fits; moo3_fits];
+       % all_inx = [moo1_inx; moo2_inx; moo3_inx];
+catch e
+       fprintf('Exhaustive search result not existed. Only MOO results will be ranked.\n');
+       all_solutions = [moo1_solutions; moo2_solutions; moo3_solutions];
+       all_fits = [moo1_fits; moo2_fits; moo3_fits];
+       all_inx = [moo1_inx; moo2_inx; moo3_inx];
+end
 
 % [top5_loc, ~, score] = R_method(all_fits,[1 2.5 2.5]);
 

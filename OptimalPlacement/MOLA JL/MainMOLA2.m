@@ -4,16 +4,16 @@ clc
 
 addpath("D:\Jacky\MATLAB\Standardized_functions")
 global PORT_NUM
-PORT_NUM = 8080;
-bus_sys = 69;
+PORT_NUM = 8083;
+bus_sys = 33;
 pf_model = "LDF";
 
 % Optimizator Parameters
-LB = [1 2 2 2 2 2 2 2 2 76 76 76 76 76 76 76 76];  %lower bounds
-UB = [8 69 69 69 69 69 69 69 69 304 304 304 304 304 304 304 304];   %upper bounds
+% LB = [1 2 2 2 2 2 2 2 2 76 76 76 76 76 76 76 76];  %lower bounds
+% UB = [8 69 69 69 69 69 69 69 69 304 304 304 304 304 304 304 304];   %upper bounds
 
-% LB = [1 2 2 2 2 76 76 76 76];  %lower bounds
-% UB = [4 33 33 33 33 304 304 304 304];   %upper bounds
+LB = [1 2 2 2 2 76 76 76 76];  %lower bounds
+UB = [4 33 33 33 33 304 304 304 304];   %upper bounds
 
 pop = 100;         %Population
 n_iter = 100;      %Max number os iterations/gerations

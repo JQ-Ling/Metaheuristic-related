@@ -11,10 +11,11 @@ clear all; close all; clc;
 
 % Add the path to the standardized functions
 addpath('D:\Jacky\MATLAB\Standardized_functions');
-bus_sys = 33;
-pf_model = "ptdf";
+bus_sys = 69;
+pf_model = "LDF"; % "ptdf" or "LDF"
 
 all_MOO = ['MOPSO'; 'MOLA '; 'MOMSA'];
+% all_MOO = ['MOMSA'];
 
 for MOO_idx = 1:size(all_MOO,1)
     % Initialize empty arrays to store concatenated data
@@ -33,10 +34,10 @@ for MOO_idx = 1:size(all_MOO,1)
     for i = 1:10
         % Construct the filename based on your pattern
         filename = strcat("D:\Jacky\Data Output\CES size and loc\", string(bus_sys), "bus_", pf_model, "\raw\", MOO, " result ", num2str(i), ".xlsx");
-        
+
         % Try to read the file
         try
-            fprintf('Reading file: %s\n', filename);
+            % fprintf('Reading file: %s\n', filename);
             
             % Read data from Sheet1 (POS) and Sheet2 (Fitness)
             [POS, ~, ~] = xlsread(filename, 'Sheet1');

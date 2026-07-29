@@ -6,9 +6,9 @@ clear all
 
 addpath('D:\Jacky\MATLAB\Standardized_functions');
 global PORT_NUM
-PORT_NUM = 8080;
+PORT_NUM = 8081;
 bus_sys = 69;
-pf_model = "ptdf";
+pf_model = "LDF";
 
 %% Select the test functions
 % True_Pareto=load('OSY-PF.txt');
@@ -27,7 +27,7 @@ ishow = 1;
 
 %% Start the evolution process
 %%  START  THE  EXECUTION  OF  THE  ALGORITHM 
-for i = 1:3
+for i = 21:40
     [Pareto, gen_sol, PF_log] = MOMSA(D,M, LB,UB,N,GEN,ishow);
     Pareto_objective = Pareto(:,D+1:D+M);
     Pareto_position = Pareto(:,1:D);
@@ -64,7 +64,7 @@ for i = 1:3
     % FinalPOS = Pareto_position(top5_loc,:);
     FinalPOS = Pareto_position;
     FinalFitness = Pareto_objective;
-    filename_test = strcat("D:\Jacky\Data Output\CES size and loc\", string(bus_sys), "bus_", pf_model, "\raw\MOMSA result_", num2str(i) ,".xlsx");
+    filename_test = strcat("D:\Jacky\Data Output\CES size and loc\", string(bus_sys), "bus_", pf_model, "\raw\MOMSA result ", num2str(i) ,".xlsx");
     xlswrite(filename_test, FinalPOS, 'Sheet1');
     xlswrite(filename_test, FinalFitness, 'Sheet2');
 
